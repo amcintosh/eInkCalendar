@@ -30,7 +30,6 @@
 
 import logging
 from . import epdconfig
-import numpy as np
 
 # Display resolution
 EPD_WIDTH       = 122
@@ -202,7 +201,7 @@ class EPD:
                 self.send_data(image[i + j * linewidth])   
         self.TurnOnDisplay()
     
-    def Clear(self, color):
+    def Clear(self, color=0xFF):
         if self.width%8 == 0:
             linewidth = int(self.width/8)
         else:

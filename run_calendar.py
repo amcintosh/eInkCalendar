@@ -7,7 +7,7 @@ import displayRun
 
 def main():
     schedule.every().day.at("00:00").do(displayRun.main)
-    schedule.every(12).hours.do(displayRun.main)
+    schedule.every(6).hours.do(displayRun.main)
 
     displayRun.main()
     while True:

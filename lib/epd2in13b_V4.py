@@ -1,11 +1,11 @@
 # *****************************************************************************
-# * | File        :	  epd7in5.py
+# * | File        :	  epd2in13b_V4.py
 # * | Author      :   Waveshare team
 # * | Function    :   Electronic paper driver
 # * | Info        :
 # *----------------
-# * | This version:   V4.0
-# * | Date        :   2019-06-20
+# * | This version:   V1.0
+# * | Date        :   2022-04-21
 # # | Info        :   python demo
 # -----------------------------------------------------------------------------
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,13 +27,12 @@
 # THE SOFTWARE.
 #
 
-
 import logging
 from . import epdconfig
 
 # Display resolution
-EPD_WIDTH       = 880
-EPD_HEIGHT      = 528
+EPD_WIDTH       = 122
+EPD_HEIGHT      = 250
 
 logger = logging.getLogger(__name__)
 
@@ -45,136 +44,158 @@ class EPD:
         self.cs_pin = epdconfig.CS_PIN
         self.width = EPD_WIDTH
         self.height = EPD_HEIGHT
-    
-    # Hardware reset
+
+    # hardware reset
     def reset(self):
         epdconfig.digital_write(self.reset_pin, 1)
-        epdconfig.delay_ms(200) 
+        epdconfig.delay_ms(20) 
         epdconfig.digital_write(self.reset_pin, 0)
         epdconfig.delay_ms(2)
         epdconfig.digital_write(self.reset_pin, 1)
-        epdconfig.delay_ms(200)   
+        epdconfig.delay_ms(20)   
 
+    # send 1 byte command
     def send_command(self, command):
         epdconfig.digital_write(self.dc_pin, 0)
         epdconfig.digital_write(self.cs_pin, 0)
         epdconfig.spi_writebyte([command])
         epdconfig.digital_write(self.cs_pin, 1)
-
+    
+    # send 1 byte data
     def send_data(self, data):
         epdconfig.digital_write(self.dc_pin, 1)
         epdconfig.digital_write(self.cs_pin, 0)
         epdconfig.spi_writebyte([data])
         epdconfig.digital_write(self.cs_pin, 1)
         
+    # send a lot of data   
     def send_data2(self, data):
         epdconfig.digital_write(self.dc_pin, 1)
         epdconfig.digital_write(self.cs_pin, 0)
         epdconfig.spi_writebyte2(data)
         epdconfig.digital_write(self.cs_pin, 1)
         
-    def ReadBusy(self):
+    # judge e-Paper whether is busy
+    def busy(self):
         logger.debug("e-Paper busy")
-        busy = epdconfig.digital_read(self.busy_pin)
-        while(busy == 1):
-            busy = epdconfig.digital_read(self.busy_pin)
-        epdconfig.delay_ms(200)
+        while(epdconfig.digital_read(self.busy_pin) != 0): 
+            epdconfig.delay_ms(10)
+        logger.debug("e-Paper busy release")
+
+    # set the display window
+    def set_windows(self, xstart, ystart, xend, yend):
+        self.send_command(0x44) # SET_RAM_X_ADDRESS_START_END_POSITION
+        self.send_data((xstart>>3) & 0xff)
+        self.send_data((xend>>3) & 0xff)
         
+        self.send_command(0x45) # SET_RAM_Y_ADDRESS_START_END_POSITION
+        self.send_data(ystart & 0xff)
+        self.send_data((ystart >> 8) & 0xff)
+        self.send_data(yend & 0xff)
+        self.send_data((yend >> 8) & 0xff)
+        
+    # set the display cursor(origin)
+    def set_cursor(self, xstart, ystart):
+        self.send_command(0x4E) # SET_RAM_X_ADDRESS_COUNTER
+        self.send_data(xstart & 0xff)
+
+        self.send_command(0x4F) # SET_RAM_Y_ADDRESS_COUNTER
+        self.send_data(ystart & 0xff)
+        self.send_data((ystart >> 8) & 0xff)
+
+    # initialize 
     def init(self):
         if (epdconfig.module_init() != 0):
             return -1
-        # EPD hardware init start
+            
         self.reset()
+
+        self.busy()
+        self.send_command(0x12)  # SWRESET
+        self.busy()   
+
+        self.send_command(0x01) # Driver output control      
+        self.send_data(0xf9)
+        self.send_data(0x00)
+        self.send_data(0x00)
+
+        self.send_command(0x11) # data entry mode       
+        self.send_data(0x03)
+
+        self.set_windows(0, 0, self.width - 1, self.height - 1)
+        self.set_cursor(0, 0)
+
+        self.send_command(0x3C) # BorderWavefrom
+        self.send_data(0x05)	
+
+        self.send_command(0x18) # Read built-in temperature sensor
+        self.send_data(0x80)	
+
+        self.send_command(0x21) # Display update control
+        self.send_data(0x80)	
+        self.send_data(0x80)
+
+        self.busy()
         
-        self.ReadBusy()
-        self.send_command(0x12)  #SWRESET
-        self.ReadBusy()
-
-        self.send_command(0x46)  # Auto Write Red RAM
-        self.send_data(0xf7)
-        self.ReadBusy()
-        self.send_command(0x47)  # Auto Write  B/W RAM
-        self.send_data(0xf7)
-        self.ReadBusy()
-
-        self.send_command(0x0C)  # Soft start setting
-        self.send_data2([0xAE, 0xC7, 0xC3, 0xC0, 0x40])
-
-        self.send_command(0x01)  # Set MUX as 527
-        self.send_data2([0xAF, 0x02, 0x01])
-
-        self.send_command(0x11)  # Data entry mode      
-        self.send_data(0x01)
-
-        self.send_command(0x44) 
-        self.send_data2([0x00, 0x00, 0x6F, 0x03]) # RAM x address start at 0
-        self.send_command(0x45) 
-        self.send_data2([0xAF, 0x02, 0x00, 0x00])
-
-        self.send_command(0x3C) # VBD
-        self.send_data(0x05) # LUT1, for white
-
-        self.send_command(0x18)
-        self.send_data(0X80)
-
-
-        self.send_command(0x22)
-        self.send_data(0XB1) #Load Temperature and waveform setting.
-        self.send_command(0x20)
-        self.ReadBusy()
-
-        self.send_command(0x4E) # set RAM x address count to 0
-        self.send_data2([0x00, 0x00])
-        self.send_command(0x4F) 
-        self.send_data2([0x00, 0x00])
-        # EPD hardware init end
         return 0
 
+    # turn on display
+    def ondisplay(self):
+        self.send_command(0x20)
+        self.busy()
+
+    # image converted to bytearray
     def getbuffer(self, image):
         img = image
         imwidth, imheight = img.size
         if(imwidth == self.width and imheight == self.height):
             img = img.convert('1')
         elif(imwidth == self.height and imheight == self.width):
+            # image has correct dimensions, but needs to be rotated
             img = img.rotate(90, expand=True).convert('1')
         else:
             logger.warning("Wrong image dimensions: must be " + str(self.width) + "x" + str(self.height))
             # return a blank buffer
-            return [0xff] * int(self.width * self.height / 8)
+            return [0x00] * (int(self.width/8) * self.height)
 
         buf = bytearray(img.tobytes('raw'))
         return buf
-        
-    def display(self, image):
-        self.send_command(0x4F) 
-        self.send_data2([0x00, 0x00])
+
+    # display image
+    def display(self, imageblack, imagered):
         self.send_command(0x24)
-        self.send_data2(image)
-        self.send_command(0x22)
-        self.send_data(0xF7)#Load LUT from MCU(0x32)
-        self.send_command(0x20)
-        epdconfig.delay_ms(10)
-        self.ReadBusy()
+        self.send_data2(imageblack)
         
-    def Clear(self):
-        buf = [0xff] * int(self.width * self.height / 8)
-        self.send_command(0x4F) 
-        self.send_data2([0x00, 0x00])
+        self.send_command(0x26)
+        self.send_data2(imagered)
+        
+        self.ondisplay()
+        
+    # display white image
+    def clear(self):
+        if self.width%8 == 0:
+            linewidth = int(self.width/8)
+        else:
+            linewidth = int(self.width/8) + 1
+            
+        buf = [0xff] * (int(linewidth * self.height))
+            
         self.send_command(0x24)
         self.send_data2(buf)
-            
+        
         self.send_command(0x26)
         self.send_data2(buf)
-                
-        self.send_command(0x22)
-        self.send_data(0xF7)#Load LUT from MCU(0x32)
-        self.send_command(0x20)
-        epdconfig.delay_ms(10)
-        self.ReadBusy()
+        
+        self.ondisplay()
 
+    # Compatible with older version functions
+    def Clear(self):
+        self.clear()
+
+    # sleep
     def sleep(self):
-        self.send_command(0x10)
-        self.send_data(0x01)
+        self.send_command(0x10) # DEEP_SLEEP
+        self.send_data(0x01) # check code
         
         epdconfig.delay_ms(2000)
         epdconfig.module_exit()

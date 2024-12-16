@@ -12,7 +12,8 @@ import lib.epd7in5b_V2 as eInk
 logger = logging.getLogger('app')
 CURRENT_DICT = os.path.dirname(os.path.realpath(__file__))
 PICTURE_DICT = os.path.join(CURRENT_DICT, 'pictures')
-
+_IMAGE = Image.new("RGB", (200, 100), (255, 255, 255))
+DRAW = ImageDraw.Draw(_IMAGE)
 
 def init_display(epd: eInk.EPD):
     logger.info("Init display")
@@ -30,18 +31,27 @@ def set_sleep(epd: eInk.EPD):
 
 
 def draw_text_centered(text: str, point: Tuple[float, float], canvas: TImageDraw, text_font: ImageFont.FreeTypeFont):
-    text_width, _ = text_font.getsize(text)
+    # getsize removed in pillow 6
+    # stead use bounded box
+    # text_width, _ = text_font.getsize(text)
+    bbox = DRAW.textbbox((0, 0), text, font=font)
+    text_width = bbox[2] - bbox[0]
     canvas.text((point[0] - text_width/2, point[1]),
                 text, font=text_font, fill=0)
 
 
 def get_font_height(font: ImageFont.FreeTypeFont):
-    _, text_height = font.getsize("A")
+    # getsize removed in pillow 6
+    # stead use bounded box
+    # _, text_height = font.getsize("A")
+    bbox = DRAW.textbbox((0, 0), "A", font=font)
+    text_height = bbox[3] - bbox[1]
     return text_height
 
 
 def get_font_width(font: ImageFont.FreeTypeFont, text: str):
-    text_width, _ = font.getsize(text)
+    bbox = DRAW.textbbox((0, 0), text, font=font)
+    text_width = bbox[2] - bbox[0]
     return text_width
 
 
@@ -55,13 +65,12 @@ def convert_image_to_screen(image: TImage) -> TImage:
 
     image_array = np.array(image)
     converted_image_array = vfunc(image_array)
-    return Image.fromarray(converted_image_array)
+    return Image.fromarray(converted_image_array, "RGB")
 
 
 def get_portal_images(cake=False, flying=False, pellet_hazard=False, bridge=False) -> List[TImage]:
     def load_picture(name: str) -> TImage:
-        return convert_image_to_screen(Image.open(
-            os.path.join(PICTURE_DICT, name)))
+        return convert_image_to_screen(Image.open(os.path.join(PICTURE_DICT, name)))
 
     def bool_to_array_index(boolean: bool) -> int:
         if boolean:

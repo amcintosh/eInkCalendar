@@ -1,3 +1,3 @@
 #!/bin/bash
 cd $(dirname $0)
-python3 ./run_calendar.py
+/home/andrew/eInkCalendar/.env/bin/python ./run_calendar.py
