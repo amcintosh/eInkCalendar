@@ -25,6 +25,8 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"),
                     logging.StreamHandler()])
 logger = logging.getLogger('app')
 
+MAX_EVENTS = 12
+
 CURRENT_DICT = os.path.dirname(os.path.realpath(__file__))
 PICTURE_DICT = os.path.join(CURRENT_DICT, 'pictures')
 FONT_DICT = os.path.join(CURRENT_DICT, 'fonts')
@@ -118,7 +120,7 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
 
     # Calendar
     current_height += height/50
-    event_list = get_events(7)
+    event_list = get_events(MAX_EVENTS)
 
     last_event_day = datetime.now().date()
     for event in event_list:
