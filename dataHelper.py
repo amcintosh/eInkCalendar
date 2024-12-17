@@ -65,7 +65,7 @@ def get_webdav_events(url: str, max_number: int) -> List[Event]:
 def get_birthdays() -> List[str]:
     logger.info("Retrieving contact (birthday) infos")
     try:
-        auth = HTTPBasicAuth(settings.CALDAV_CONTACT_USER, CALDAV_CONTACT_PWD)
+        auth = HTTPBasicAuth(settings.CALDAV_CONTACT_USER, settings.CALDAV_CONTACT_PWD)
         baseurl = urlparse(settings.CALDAV_CONTACT_URL).scheme + \
             '://' + urlparse(settings.CALDAV_CONTACT_URL).netloc
 

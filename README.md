@@ -125,17 +125,13 @@ The prerequisites are based on [this](https://www.waveshare.com/wiki/7.5inch_e-P
    You can list all installed local-packages with `locale -a`.
    If the desired one is missing, add it in this menu `sudo dpkg-reconfigure locales` (for Raspberry Pis) or take a look at the general [Debian Wiki](https://wiki.debian.org/Locale)).
 
-   `WEBDAV_CALENDAR_URL = "webcal://p32-caldav.icloud.com/published/2/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"` The address of your shared wabdav calendar. (It needs to be publicly accessible by this URL)
-
-   `WEBDAV_IS_APPLE = True` Is the calendar hosted on icloud?
+   `CALENDAR_URLS` The addresses of your shared calendars. (It needs to be publicly accessible by this URL)
 
    `CALDAV_CONTACT_USER = "louis"` Username for logging into your CALDAV contact-list.
 
    `CALDAV_CONTACT_PWD = "secret"` Password for logging into your CALDAV contact-list.
 
    `ROTATE_IMAGE = True` This will rotate the image 180° before printing it to the calendar. `True` is required if you use my STL, as the dipay is mounted upside-down.
-
-
 
 4. Add the start-script to your boot-process:\
    (You might need to adapt the path `/home/pi/eInkCalendar/run_calendar.sh` acordingly)
