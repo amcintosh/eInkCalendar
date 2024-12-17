@@ -1,6 +1,6 @@
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List
 from urllib.parse import urlparse
 
@@ -12,7 +12,7 @@ from icalevents.icalparser import Event
 from lxml import etree
 from requests.auth import HTTPBasicAuth
 
-from settings import *
+import settings
 
 logger = logging.getLogger('app')
 
@@ -22,12 +22,20 @@ def sort_by_date(e: Event):
 
 
 def get_events(max_number: int) -> List[Event]:
+    events = []
+    for calendar_url in settings.CALENDAR_URLS:
+        events += get_webdav_events(calendar_url, max_number)
+    events.sort(key=sort_by_date)
+    return events[:max_number]
+
+
+def get_webdav_events(url: str, max_number: int) -> List[Event]:
     logger.info("Retrieving calendar infos")
     utc_timezone = tz.tzutc()
     current_timezone = tz.tzlocal()
-
+    is_apple = "icloud" in url
     try:
-        event_list = events(WEBDAV_CALENDAR_URL, fix_apple=WEBDAV_IS_APPLE)
+        event_list = events(url, fix_apple=is_apple)
         event_list.sort(key=sort_by_date)
 
         start_count = 0
@@ -57,15 +65,15 @@ def get_events(max_number: int) -> List[Event]:
 def get_birthdays() -> List[str]:
     logger.info("Retrieving contact (birthday) infos")
     try:
-        auth = HTTPBasicAuth(CALDAV_CONTACT_USER, CALDAV_CONTACT_PWD)
-        baseurl = urlparse(CALDAV_CONTACT_URL).scheme + \
-            '://' + urlparse(CALDAV_CONTACT_URL).netloc
+        auth = HTTPBasicAuth(settings.CALDAV_CONTACT_USER, CALDAV_CONTACT_PWD)
+        baseurl = urlparse(settings.CALDAV_CONTACT_URL).scheme + \
+            '://' + urlparse(settings.CALDAV_CONTACT_URL).netloc
 
-        r = requests.request('PROPFIND', CALDAV_CONTACT_URL, auth=auth, headers={
+        r = requests.request('PROPFIND', settings.CALDAV_CONTACT_URL, auth=auth, headers={
             'content-type': 'text/xml', 'Depth': '1'})
         if r.status_code != 207:
             raise RuntimeError('error in response from %s: %r' %
-                               (CALDAV_CONTACT_URL, r))
+                               (settings.CALDAV_CONTACT_URL, r))
 
         vcardUrlList = []
         root = etree.XML(r.text.encode())

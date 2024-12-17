@@ -80,7 +80,7 @@ The prerequisites are based on [this](https://www.waveshare.com/wiki/7.5inch_e-P
 * Install BCM2835 libraries
   ```sh
   wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.60.tar.gz
-  tar zxvf bcm2835-1.60.tar.gz 
+  tar zxvf bcm2835-1.60.tar.gz
   cd bcm2835-1.60/
   sudo ./configure
   sudo make
@@ -90,10 +90,12 @@ The prerequisites are based on [this](https://www.waveshare.com/wiki/7.5inch_e-P
 * Install wiringPi libraries
   ```sh
   sudo apt-get install wiringpi
-  
+
   #For Pi 4, you need to update it：
   cd /tmp
-  wget https://project-downloads.drogon.net/wiringpi-latest.deb
+  wget https://github.com/WiringPi/WiringPi/releases/download/3.10/wiringpi_3.10_arm64.deb
+  # or
+  https://github.com/WiringPi/WiringPi/releases/download/3.10/wiringpi_3.10_armhf.deb
   sudo dpkg -i wiringpi-latest.deb
   ```
 
@@ -118,19 +120,19 @@ The prerequisites are based on [this](https://www.waveshare.com/wiki/7.5inch_e-P
    ```
    Now edit `settings.py` and set all your settings:
 
-   `LOCALE: "en_US"` (or e.g. `en-GB.UTF-8`) Select your desired format and language. 
-   It needs to be installed on your device (which 95% of time is already the case - as it's you system-language. 
+   `LOCALE: "en_US"` (or e.g. `en-GB.UTF-8`) Select your desired format and language.
+   It needs to be installed on your device (which 95% of time is already the case - as it's you system-language.
    You can list all installed local-packages with `locale -a`.
-   If the desired one is missing, add it in this menu `sudo dpkg-reconfigure locales` (for Raspberry Pis) or take a look at the general [Debian Wiki](https://wiki.debian.org/Locale)). 
-   
+   If the desired one is missing, add it in this menu `sudo dpkg-reconfigure locales` (for Raspberry Pis) or take a look at the general [Debian Wiki](https://wiki.debian.org/Locale)).
+
    `WEBDAV_CALENDAR_URL = "webcal://p32-caldav.icloud.com/published/2/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"` The address of your shared wabdav calendar. (It needs to be publicly accessible by this URL)
-   
+
    `WEBDAV_IS_APPLE = True` Is the calendar hosted on icloud?
-   
+
    `CALDAV_CONTACT_USER = "louis"` Username for logging into your CALDAV contact-list.
-   
+
    `CALDAV_CONTACT_PWD = "secret"` Password for logging into your CALDAV contact-list.
-   
+
    `ROTATE_IMAGE = True` This will rotate the image 180° before printing it to the calendar. `True` is required if you use my STL, as the dipay is mounted upside-down.
 
 
@@ -141,7 +143,7 @@ The prerequisites are based on [this](https://www.waveshare.com/wiki/7.5inch_e-P
    Make `run_calendar.sh` executable
    ```sh
    chmod +x /home/pi/eInkCalendar/run_calendar.sh
-   ``` 
+   ```
    and add it to crontab, as follows:
    ```sh
    crontab -e

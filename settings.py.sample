@@ -1,7 +1,16 @@
 LOCALE = "de_DE"
 
-WEBDAV_CALENDAR_URL = "webcal://..."
-WEBDAV_IS_APPLE = True
+"""Get events from Google Calendar.
+
+To get it, go to your Google Calendar, click on the options menu next to the calendar
+in the sidebar. Choose 'Settings and sharing.' Scroll down to 'Integrate calendar' and
+copy the 'Secret address in iCal format'
+"""
+CALENDAR_URLS = [
+    "https://calendar.google.com/.../basic.ics",
+    "webcal://....icloud.com/..."
+]
+
 
 CALDAV_CONTACT_URL = "https://..."
 CALDAV_CONTACT_USER = "username"
