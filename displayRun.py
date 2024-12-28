@@ -69,7 +69,7 @@ def main():
 def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
     locale.setlocale(locale.LC_ALL, LOCALE)
 
-    PADDING_L = int(width/50)
+    PADDING_L = int(width/45)
     PADDING_R = int(width/30)
     PADDING_TOP = int(height/30)
     now = time.localtime()
@@ -77,8 +77,6 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
     day_str = time.strftime("%A")
     day_number = now.tm_mday
     month_str = time.strftime("%B")
-
-    # draw_text_centered(str(day_number), (width/2, 0), draw, FONT_ROBOTO_H1)
 
     # Heading
     current_height = PADDING_TOP * 0.75
@@ -89,7 +87,7 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
 
     # Date
     current_font_height = get_font_height(FONT_ROBOTO_DATE)
-    draw.text((0, current_height - current_font_height/10), str(day_number), font=FONT_ROBOTO_DATE, fill=1)
+    draw.text((PADDING_L, current_height - current_font_height/10), str(day_number), font=FONT_ROBOTO_DATE, fill=1)
     current_height += current_font_height
 
     # Month-Overview (with day-string)
@@ -133,7 +131,6 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
             current_height += get_font_height(FONT_ROBOTO_P) * 1.5
 
         # Draw event
-        event_text = ""
         if event.all_day:
             draw.text((PADDING_L, current_height), " - : -", font=FONT_POPPINS_P, fill=1)
         else:
@@ -144,29 +141,29 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
         current_height += get_font_height(FONT_POPPINS_P) * 1.5
 
     # Portal-Icons
-    current_height = int(height * 0.85)
+    current_height = int(height * 0.82)
     draw.line((PADDING_L, current_height, width - PADDING_R, current_height), fill=1, width=LINE_WIDTH)
-    current_height += PADDING_TOP
+    current_height += 10
 
     y = PADDING_L
+    image_padding = PADDING_L
+    max_image_height = 0
+
     bithday_persons = get_birthdays()
     draw_cake = len(bithday_persons) > 0
-    max_image_height = 0
-    for botton_image in get_portal_images(draw_cake, True, bool(random.getrandbits(1)), bool(random.getrandbits(1))):
-        logger.warn("Pasting Image %s", botton_image)
-        #draw.text((PADDING_L + y, current_height), f"Image {y}", font=FONT_POPPINS_P, fill=1)
-        image.paste(botton_image, (0, current_height))
+    for botton_image in get_portal_images(draw_cake):
+        image.paste(botton_image, (image_padding, current_height))
 
         image_width, image_height = botton_image.size
         y += image_width + PADDING_TOP
         max_image_height = image_height if (
             image_height > max_image_height) else max_image_height
     current_height += max_image_height + PADDING_TOP
+
     # Draw name of birthday-person
     if draw_cake:
-        bithday_person_string = ", ".join(bithday_persons)
-        draw.text((PADDING_L, current_height), bithday_person_string, font=FONT_ROBOTO_P, fill=1)
-        current_height += get_font_height(FONT_ROBOTO_P)
+        bithday_persons_string = ", ".join(bithday_persons)
+        draw.text((PADDING_L, current_height), f"Birthdays: {bithday_persons_string}", font=FONT_ROBOTO_P, fill=1)
 
 
 def show_content(epd: eInk.EPD, image: TImage):
