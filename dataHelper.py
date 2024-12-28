@@ -1,5 +1,4 @@
 import logging
-import time
 from datetime import datetime
 from typing import List
 from urllib.parse import urlparse
@@ -22,11 +21,11 @@ def sort_by_date(e: Event):
 
 
 def get_events(max_number: int) -> List[Event]:
-    events = []
+    cal_events = []
     for calendar_url in settings.CALENDAR_URLS:
-        events.extend(get_webdav_events(calendar_url, max_number))
-    events.sort(key=sort_by_date)
-    return events[:max_number]
+        cal_events.extend(get_webdav_events(calendar_url, max_number))
+    cal_events.sort(key=sort_by_date)
+    return cal_events[:max_number]
 
 
 def get_webdav_events(url: str, max_number: int) -> List[Event]:
@@ -48,7 +47,11 @@ def get_webdav_events(url: str, max_number: int) -> List[Event]:
             if event.end == today_midnight:
                 start_count += 1
                 max_number += 1
-        logger.info("Got %s calendar-entries (capped to %s)", len(event_list), max_number-start_count)
+        logger.info(
+            "Got %s calendar-entries (capped to %s)",
+            len(event_list) - start_count,
+            max_number - start_count
+        )
         return event_list[start_count:max_number]
 
     except Exception as e:
