@@ -7,7 +7,6 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 from PIL.Image import Image as TImage
 from PIL.ImageDraw import ImageDraw as TImageDraw
 
-import lib.epd7in5b_V2 as eInk
 
 logger = logging.getLogger('app')
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -16,17 +15,17 @@ _IMAGE = Image.new("RGB", (200, 100), (255, 255, 255))
 DRAW = ImageDraw.Draw(_IMAGE)
 
 
-def init_display(epd: eInk.EPD):
+def init_display(epd):
     logger.info("Init display")
     epd.init()
 
 
-def clear_display(epd: eInk.EPD):
+def clear_display(epd):
     logger.info("Clear display")
     epd.Clear()
 
 
-def set_sleep(epd: eInk.EPD):
+def set_sleep(epd):
     logger.info("Set display to sleep-mode")
     epd.sleep()
 

@@ -1,5 +1,6 @@
 LOCALE = "de_DE"
 ROTATE_IMAGE = True
+DEBUG = False
 
 """Get events from Google Calendar.
 

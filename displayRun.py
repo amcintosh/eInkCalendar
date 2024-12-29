@@ -3,21 +3,16 @@ import calendar
 import locale
 import logging
 import os
-import random
-import sys
 import time
 from datetime import datetime
 
-import schedule
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFont
 from PIL.Image import Image as TImage
 from PIL.ImageDraw import ImageDraw as TImageDraw
 
-from lib import epd7in5_V2
-
-from dataHelper import get_events, get_birthdays
-from displayHelpers import *
-from settings import LOCALE, ROTATE_IMAGE
+from dataHelper import get_birthdays, get_events
+from displayHelpers import clear_display, get_font_height, get_font_width, get_portal_images, init_display, set_sleep
+from settings import DEBUG, LOCALE, ROTATE_IMAGE
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"),
                     format="%(asctime)s - %(levelname)s, %(module)s:%(lineno)s - %(message)s",
@@ -31,8 +26,6 @@ CURRENT_DICT = os.path.dirname(os.path.realpath(__file__))
 PICTURE_DICT = os.path.join(CURRENT_DICT, 'pictures')
 FONT_DICT = os.path.join(CURRENT_DICT, 'fonts')
 
-DEBUG = False
-
 FONT_ROBOTO_DATE = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 150)
 FONT_ROBOTO_H1 = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 40)
 FONT_ROBOTO_H2 = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 30)
@@ -41,14 +34,23 @@ FONT_POPPINS_BOLT_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Poppins-Bold.t
 FONT_POPPINS_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Poppins-Regular.ttf'), 20)
 LINE_WIDTH = 3
 
+if DEBUG:
+    class FakeEPD:
+        def __init__(self):
+            self.width = 800
+            self.height = 480
+else:
+    from lib import epd7in5_V2
+
 
 def main():
     logger.info(datetime.now())
     try:
-        epd = epd7in5_V2.EPD()
-
         if DEBUG:
             logger.info("DEBUG-Mode activated...")
+            epd = FakeEPD()
+        else:
+            epd = epd7in5_V2.EPD()
 
         image = Image.open(os.path.join(
             PICTURE_DICT, "blank-hk.bmp"))
@@ -62,7 +64,7 @@ def main():
         logger.exception(e)
         if not DEBUG:
             logger.info("Trying to module_exit()")
-            eInk.epdconfig.module_exit()
+            epd7in5_V2.epdconfig.module_exit()
         raise e
 
 
@@ -166,7 +168,7 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
         draw.text((PADDING_L, current_height), f"Birthdays: {bithday_persons_string}", font=FONT_ROBOTO_P, fill=1)
 
 
-def show_content(epd: eInk.EPD, image: TImage):
+def show_content(epd, image: TImage):
     logger.info("Exporting final image")
     image.save("EXPORT.bmp")
     if ROTATE_IMAGE:
@@ -178,7 +180,7 @@ def show_content(epd: eInk.EPD, image: TImage):
         set_sleep(epd)
 
 
-def clear_content(epd: eInk.EPD):
+def clear_content(epd):
     if DEBUG:
         logger.warning("Clear has no effect while debugging")
     else:
