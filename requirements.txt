@@ -2,7 +2,6 @@ icalevents==0.1.29
 numpy==2.2.0
 vobject==0.9.9
 lxml==5.3.0
-schedule==1.2.2
 pillow==11.0.0
 requests==2.32.3
 spidev==3.6
