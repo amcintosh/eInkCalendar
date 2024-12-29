@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List
 from urllib.parse import urlparse
 
@@ -40,8 +40,12 @@ def get_webdav_events(url: str, max_number: int) -> List[Event]:
 
         start_count = 0
         for event in event_list:
-            event.start.replace(tzinfo=utc_timezone)
-            event.start = event.start.astimezone(current_timezone)
+            if event.all_day:
+                event.start.replace(tzinfo=current_timezone)
+            else:
+                event.start.replace(tzinfo=utc_timezone)
+                event.start = event.start.astimezone(current_timezone)
+
             # Multi-day events end at midnight of the previous/current
             # day and thus show up after they're over.
             if event.end == today_midnight:
