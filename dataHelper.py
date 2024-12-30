@@ -1,11 +1,17 @@
 import logging
-from datetime import datetime, timedelta
+import os.path
+from datetime import datetime
 from typing import List
 from urllib.parse import urlparse
 
 import requests
 import vobject
 from dateutil import tz
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from icalevents.icalevents import events
 from icalevents.icalparser import Event
 from lxml import etree
@@ -63,21 +69,22 @@ def get_webdav_events(url: str, max_number: int) -> List[Event]:
         return []
 
 
-def get_birthdays() -> List[str]:
+def get_birthdays_caldav() -> List[str]:
     logger.info("Retrieving contact (birthday) infos")
     try:
-        auth = HTTPBasicAuth(settings.CALDAV_CONTACT_USER, settings.CALDAV_CONTACT_PWD)
+        session = requests.Session()
+        session.auth = HTTPBasicAuth(settings.CALDAV_CONTACT_USER, settings.CALDAV_CONTACT_PWD)
         baseurl = urlparse(settings.CALDAV_CONTACT_URL).scheme + \
             '://' + urlparse(settings.CALDAV_CONTACT_URL).netloc
 
-        r = requests.request('PROPFIND', settings.CALDAV_CONTACT_URL, auth=auth, headers={
-            'content-type': 'text/xml', 'Depth': '1'})
-        if r.status_code != 207:
+        resp = requests.request('PROPFIND', settings.CALDAV_CONTACT_URL, headers={'Depth': '1'})
+        import pdb; pdb.set_trace()
+        if resp.status_code != 207:
             raise RuntimeError('error in response from %s: %r' %
                                (settings.CALDAV_CONTACT_URL, r))
 
         vcardUrlList = []
-        root = etree.XML(r.text.encode())
+        root = etree.XML(resp.text.encode())
         for link in root.xpath('./d:response/d:propstat/d:prop/d:getcontenttype[starts-with(.,"text/vcard")]/../../../d:href', namespaces={"d": "DAV:"}):
             vcardUrlList.append(baseurl + link.text)
 
@@ -102,3 +109,58 @@ def get_birthdays() -> List[str]:
     except Exception as e:
         logger.critical(e)
         return []
+
+
+def get_birthdays_google() -> List[str]:
+    scopes = ["https://www.googleapis.com/auth/contacts.readonly"]
+    logger.info("Retrieving contact (birthday) infos")
+    today = datetime.today()
+    birthday_names: List[str] = []
+
+    creds = None
+    if os.path.exists("token.json"):
+        # The file token.json stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first time.
+        creds = Credentials.from_authorized_user_file("token.json", scopes)
+
+    if not creds or not creds.valid:
+        # If there are no (valid) credentials available, let the user log in.
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", scopes)
+            creds = flow.run_local_server(port=0)
+            # Save the credentials for the next run
+            with open("token.json", "w") as token:
+                token.write(creds.to_json())
+    try:
+        service = build("people", "v1", credentials=creds)
+
+        group = service.contactGroups().get(
+            resourceName=f"contactGroups/{settings.GOOGLE_CONTACTS_GROUP}",
+            maxMembers=100
+        ).execute()
+
+        results = service.people().getBatchGet(
+            resourceNames=group.get("memberResourceNames"),
+            personFields="names,birthdays",
+        ).execute()
+    except HttpError as e:
+        logger.critical(e)
+        return []
+
+    for result in results.get("responses"):
+        person = result.get("person")
+
+        if person.get("birthdays") and person.get("birthdays")[0].get("date"):
+            birthday = person.get("birthdays")[0].get("date")
+            if (birthday.get("day") == today.day) and (birthday.get("month") == today.month) and person.get("names"):
+                birthday_names.append(person.get("names")[0].get("displayName"))
+    return birthday_names
+
+
+def get_birthdays() -> List[str]:
+    if settings.GOOGLE_CONTACTS_GROUP:
+        return get_birthdays_google()
+    elif settings.CALDAV_CONTACT_USER and settings.CALDAV_CONTACT_PWD:
+        return get_birthdays_caldav()

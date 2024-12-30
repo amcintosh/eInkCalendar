@@ -13,6 +13,7 @@ CALENDAR_URLS = [
     "webcal://....icloud.com/..."
 ]
 
+GOOGLE_CONTACTS_GROUP = "some_google_contacts_group_id"
 
 CALDAV_CONTACT_URL = "https://..."
 CALDAV_CONTACT_USER = "username"

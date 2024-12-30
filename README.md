@@ -9,6 +9,7 @@ Forked from [13Bytes](https://github.com/13Bytes/eInkCalendar) but I've been hea
 
 - Updating all the dependencies as many of them did not work with the latest Raspberry Pi OSes
 - Updated to pull data from multiple calendars, including Google Calendars (which I use)
+- Updated to pull birthdays from Google Contacts
 - Removed the Python schedule library and run updates with just cron
 - I bought a slightly different eInk display which doesn't handle the red colours
 - Removed the [portal](https://store.steampowered.com/app/620/Portal_2/) chamber theme as it's not my thing
@@ -84,6 +85,11 @@ instruction to get your rapi ready for the display:
   sudo dpkg -i wiringpi_3.10_armhf.deb
   ```
 
+#### Google Contacts Integration
+
+Follow the steps [here](https://developers.google.com/people/quickstart/python) to setup authorization
+for the Google Contacts API.
+
 ### Installation
 
 1. Clone the repo
@@ -104,9 +110,10 @@ instruction to get your rapi ready for the display:
    `LOCALE: "en_US"` (or e.g. `en-GB.UTF-8`) Select your desired format and language.
    It needs to be installed on your device (which 95% of time is already the case - as it's you system-language.
    You can list all installed local-packages with `locale -a`.
-   If the desired one is missing, add it in this menu `sudo dpkg-reconfigure locales` (for Raspberry Pis) or take a look at the general [Debian Wiki](https://wiki.debian.org/Locale)).
+   If the desired one is missing, add it in this menu `sudo dpkg-reconfigure locales` (for Raspberry Pis)
+   or take a look at the general [Debian Wiki](https://wiki.debian.org/Locale)).
 
-   `CALENDAR_URLS` The addresses of your shared calendars. (It needs to be publicly accessible by this URL)
+   `CALENDAR_URLS` The addresses of your shared calendars.
 
    `CALDAV_CONTACT_USER = "louis"` Username for logging into your CALDAV contact-list.
 
