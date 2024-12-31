@@ -20,7 +20,7 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"),
                     logging.StreamHandler()])
 logger = logging.getLogger('app')
 
-MAX_EVENTS = 12
+MAX_EVENTS = 9
 
 CURRENT_DICT = os.path.dirname(os.path.realpath(__file__))
 PICTURE_DICT = os.path.join(CURRENT_DICT, 'pictures')
