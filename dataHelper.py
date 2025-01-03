@@ -1,12 +1,12 @@
 import logging
 import os.path
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 from urllib.parse import urlparse
+from zoneinfo import ZoneInfo
 
 import requests
 import vobject
-from dateutil import tz
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -23,7 +23,7 @@ logger = logging.getLogger('app')
 
 
 def sort_by_date(e: Event):
-    return e.start.astimezone()
+    return e.start
 
 
 def get_events(max_number: int) -> List[Event]:
@@ -36,8 +36,7 @@ def get_events(max_number: int) -> List[Event]:
 
 def get_webdav_events(url: str, max_number: int) -> List[Event]:
     logger.info("Retrieving calendar infos")
-    utc_timezone = tz.tzutc()
-    current_timezone = tz.tzlocal()
+    current_timezone = ZoneInfo(settings.LOCAL_TIMEZONE)
     today_midnight = datetime.now(current_timezone).replace(hour=0, minute=0, second=0, microsecond=0)
     is_apple = "icloud" in url
     try:
@@ -47,9 +46,9 @@ def get_webdav_events(url: str, max_number: int) -> List[Event]:
         start_count = 0
         for event in event_list:
             if event.all_day:
-                event.start.replace(tzinfo=current_timezone)
+                event.start = event.start.replace(tzinfo=current_timezone)
             else:
-                event.start.replace(tzinfo=utc_timezone)
+                event.start = event.start.replace(tzinfo=timezone.utc)
                 event.start = event.start.astimezone(current_timezone)
 
             # Multi-day events end at midnight of the previous/current
@@ -78,7 +77,7 @@ def get_birthdays_caldav() -> List[str]:
             '://' + urlparse(settings.CALDAV_CONTACT_URL).netloc
 
         resp = requests.request('PROPFIND', settings.CALDAV_CONTACT_URL, headers={'Depth': '1'})
-        import pdb; pdb.set_trace()
+
         if resp.status_code != 207:
             raise RuntimeError('error in response from %s: %r' %
                                (settings.CALDAV_CONTACT_URL, r))
