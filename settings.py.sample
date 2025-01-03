@@ -1,4 +1,5 @@
 LOCALE = "en_CA"
+LOCAL_TIMEZONE = "America/Toronto"
 ROTATE_IMAGE = True
 DEBUG = False
 

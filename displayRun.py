@@ -30,7 +30,7 @@ FONT_ROBOTO_DATE = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'
 FONT_ROBOTO_H1 = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 40)
 FONT_ROBOTO_H2 = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 30)
 FONT_ROBOTO_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 20)
-FONT_POPPINS_BOLT_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Poppins-Bold.ttf'), 22)
+FONT_POPPINS_BOLD_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Poppins-Bold.ttf'), 20)
 FONT_POPPINS_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Poppins-Regular.ttf'), 20)
 LINE_WIDTH = 3
 
@@ -89,16 +89,10 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
 
     # Date
     current_font_height = get_font_height(FONT_ROBOTO_DATE)
-    draw.text((PADDING_L, current_height - current_font_height/10), str(day_number), font=FONT_ROBOTO_DATE, fill=1)
+    draw.text((PADDING_L * 0.75, current_height - current_font_height/10), str(day_number), font=FONT_ROBOTO_DATE, fill=1)
     current_height += current_font_height
-
-    # Month-Overview (with day-string)
     current_height += PADDING_TOP
-    day_of_month = str(day_number) + "/" + str(max_days_in_month)
-    draw.text((PADDING_L, current_height), day_of_month, font=FONT_ROBOTO_P, fill=1)
-
-    tmp_right_aligned = width - get_font_width(FONT_ROBOTO_P, day_str.upper()) - PADDING_R
-    draw.text((tmp_right_aligned, current_height), day_str.upper(), font=FONT_ROBOTO_P, fill=1)
+    draw.text((PADDING_L, current_height), f"{day_str.upper()}", font=FONT_ROBOTO_P, fill=1)
 
     current_height += get_font_height(FONT_ROBOTO_P) + PADDING_TOP
     draw.line((PADDING_L, current_height, width - PADDING_R, current_height), fill=1, width=LINE_WIDTH)
@@ -160,7 +154,7 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
         y += image_width + PADDING_TOP
         max_image_height = image_height if (
             image_height > max_image_height) else max_image_height
-    current_height += max_image_height + PADDING_TOP
+    current_height += max_image_height
 
     # Draw name of birthday-person
     if draw_cake:
