@@ -1,7 +1,7 @@
 import logging
 import os.path
-from datetime import datetime, timezone
-from typing import List
+from datetime import date, datetime, timedelta, timezone
+from typing import List, Tuple
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
@@ -12,6 +12,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from humanize import ordinal
 from icalevents.icalevents import events
 from icalevents.icalparser import Event
 from lxml import etree
@@ -20,6 +21,8 @@ from requests.auth import HTTPBasicAuth
 import settings
 
 logger = logging.getLogger('app')
+
+UPCOMING_BIRTHDAY_DAYS = 10
 
 
 def sort_by_date(e: Event):
@@ -68,7 +71,7 @@ def get_webdav_events(url: str, max_number: int) -> List[Event]:
         return []
 
 
-def get_birthdays_caldav() -> List[str]:
+def get_birthdays_caldav() -> Tuple[List[str], List[str]]:
     logger.info("Retrieving contact (birthday) infos")
     try:
         session = requests.Session()
@@ -104,17 +107,31 @@ def get_birthdays_caldav() -> List[str]:
                 if (birthday_date.day == today.day) and (birthday_date.month == today.month):
                     name = vcard.contents['fn'][0].value
                     birthday_names.append(name)
-        return birthday_names
+        return birthday_names, []
     except Exception as e:
         logger.critical(e)
-        return []
+        return [], []
 
 
-def get_birthdays_google() -> List[str]:
+def get_birthday_date_from_google_person(person: dict) -> date:
+    if person.get("birthdays") and person.get("birthdays")[0].get("date"):
+        birthday = person.get("birthdays")[0].get("date")
+        today = date.today()
+        month = birthday.get("month")
+        day = birthday.get("day")
+        if month == 2 and day == 29 and today.year % 4 != 0:
+            day = 28
+
+        return date(year=today.year, month=month, day=day)
+    return None
+
+
+def get_birthdays_google() -> Tuple[List[str], List[str]]:
     scopes = ["https://www.googleapis.com/auth/contacts.readonly"]
     logger.info("Retrieving contact (birthday) infos")
     today = datetime.today()
     birthday_names: List[str] = []
+    upcoming_birthday_names: List[str] = []
 
     creds = None
     if os.path.exists("token.json"):
@@ -146,19 +163,20 @@ def get_birthdays_google() -> List[str]:
         ).execute()
     except HttpError as e:
         logger.critical(e)
-        return []
+        return [], []
 
+    today = date.today()
     for result in results.get("responses"):
         person = result.get("person")
+        birthday = get_birthday_date_from_google_person(person)
+        if birthday and birthday.day == today.day and birthday.month == today.month and person.get("names"):
+            birthday_names.append(person.get("names")[0].get("displayName"))
+        elif birthday and birthday > today and birthday < (today + timedelta(days=UPCOMING_BIRTHDAY_DAYS)) and person.get("names"):
+            upcoming_birthday_names.append(f"{person.get("names")[0].get("displayName")} ({ordinal(birthday.day)})")
+    return birthday_names, upcoming_birthday_names
 
-        if person.get("birthdays") and person.get("birthdays")[0].get("date"):
-            birthday = person.get("birthdays")[0].get("date")
-            if (birthday.get("day") == today.day) and (birthday.get("month") == today.month) and person.get("names"):
-                birthday_names.append(person.get("names")[0].get("displayName"))
-    return birthday_names
 
-
-def get_birthdays() -> List[str]:
+def get_birthdays() -> Tuple[List[str], List[str]]:
     if settings.GOOGLE_CONTACTS_GROUP:
         return get_birthdays_google()
     elif settings.CALDAV_CONTACT_USER and settings.CALDAV_CONTACT_PWD:

@@ -30,6 +30,7 @@ FONT_ROBOTO_DATE = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'
 FONT_ROBOTO_H1 = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 40)
 FONT_ROBOTO_H2 = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 30)
 FONT_ROBOTO_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 20)
+FONT_ROBOTO_BIRTH = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 18)
 FONT_POPPINS_BOLD_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Poppins-Bold.ttf'), 20)
 FONT_POPPINS_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Poppins-Regular.ttf'), 20)
 LINE_WIDTH = 3
@@ -139,13 +140,13 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
     # Portal-Icons
     current_height = int(height * 0.82)
     draw.line((PADDING_L, current_height, width - PADDING_R, current_height), fill=1, width=LINE_WIDTH)
-    current_height += 10
+    current_height += 5
 
     y = PADDING_L
     image_padding = PADDING_L
     max_image_height = 0
 
-    bithday_persons = get_birthdays()
+    bithday_persons, upcoming_birthday_persons = get_birthdays()
     draw_cake = len(bithday_persons) > 0
     for botton_image in get_portal_images(draw_cake):
         image.paste(botton_image, (image_padding, current_height))
@@ -159,7 +160,19 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
     # Draw name of birthday-person
     if draw_cake:
         bithday_persons_string = ", ".join(bithday_persons)
-        draw.text((PADDING_L, current_height), f"Birthdays: {bithday_persons_string}", font=FONT_ROBOTO_P, fill=1)
+        draw.text(
+            (PADDING_L, current_height),
+            f"Birthdays: {bithday_persons_string}",
+            font=FONT_ROBOTO_BIRTH, fill=1
+        )
+        current_height += get_font_height(FONT_ROBOTO_P) * 1.5
+    if upcoming_birthday_persons:
+        upcoming_birthday_persons_string = ", ".join(upcoming_birthday_persons)
+        draw.text(
+            (PADDING_L, current_height),
+            f"Upcoming: {upcoming_birthday_persons_string}",
+            font=FONT_ROBOTO_BIRTH, fill=1
+        )
 
 
 def show_content(epd, image: TImage):

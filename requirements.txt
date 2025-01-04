@@ -10,3 +10,4 @@ lgpio==0.2.2.0
 google-api-python-client==2.156.0
 google-auth-httplib2==0.2.0
 google-auth-oauthlib==1.2.1
+humanize==4.11.0
