@@ -142,20 +142,16 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
     draw.line((PADDING_L, current_height, width - PADDING_R, current_height), fill=1, width=LINE_WIDTH)
     current_height += 5
 
-    y = PADDING_L
-    image_padding = PADDING_L
-    max_image_height = 0
-
     bithday_persons, upcoming_birthday_persons = get_birthdays()
     draw_cake = len(bithday_persons) > 0
+    image_padding = PADDING_L
+    image_height = 0
     for botton_image in get_portal_images(draw_cake):
         image.paste(botton_image, (image_padding, current_height))
 
         image_width, image_height = botton_image.size
-        y += image_width + PADDING_TOP
-        max_image_height = image_height if (
-            image_height > max_image_height) else max_image_height
-    current_height += max_image_height
+        image_padding += image_width + PADDING_L
+    current_height += image_height
 
     # Draw name of birthday-person
     if draw_cake:

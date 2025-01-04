@@ -1,12 +1,12 @@
 import logging
 import os
+from datetime import date
 from typing import List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from PIL.Image import Image as TImage
 from PIL.ImageDraw import ImageDraw as TImageDraw
-
 
 logger = logging.getLogger('app')
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -79,10 +79,14 @@ def get_portal_images(cake=False) -> List[TImage]:
         else:
             return 0
 
-    image_cake_names = ["Chamber_icon_cake.gif", "Chamber_icon_cake_on.gif"]
+    today = date.today()
+    image_cake_names = ["Cake_icon.gif", "Cake_icon_on.gif"]
 
     image_list = []
     image_list.append(load_picture(image_cake_names[bool_to_array_index(cake)]))
-    #image_list.append(load_picture("ChristmasTree-b.bmp"))
+    if today.month == 12 and today.day in [24, 25]:
+        image_list.append(load_picture("Christmas_tree_icon.png"))
+    if today.month == 2 and today.day == 14:
+        image_list.append(load_picture("Valentines_icon.png"))
 
     return image_list
