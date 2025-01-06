@@ -170,11 +170,12 @@ def get_birthdays_google() -> Tuple[List[str], List[str]]:
         person = result.get("person")
         if not person.get("names") or not person.get("names")[0].get("displayName"):
             continue
+        name = person.get("names")[0].get("displayName")
         birthday = get_birthday_date_from_google_person(person)
         if birthday and birthday.day == today.day and birthday.month == today.month and person.get("names"):
             birthday_names.append(person.get("names")[0].get("displayName"))
         elif birthday and birthday > today and birthday < (today + timedelta(days=UPCOMING_BIRTHDAY_DAYS)) and person.get("names"):
-            upcoming_birthday_names.append(f"{person.get("names")[0].get("displayName")} ({ordinal(birthday.day)})")
+            upcoming_birthday_names.append(f"{name} ({ordinal(birthday.day)})")
     return birthday_names, upcoming_birthday_names
 
 
