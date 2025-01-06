@@ -48,11 +48,11 @@ def get_webdav_events(url: str, max_number: int) -> List[Event]:
 
         start_count = 0
         for event in event_list:
+            if event.start.tzinfo is None or event.start.tzinfo.utcoffset(event.start) is None:
+                event.start = event.start.replace(tzinfo=timezone.utc)
             if event.all_day:
                 event.start = event.start.replace(tzinfo=current_timezone)
-            else:
-                event.start = event.start.replace(tzinfo=timezone.utc)
-                event.start = event.start.astimezone(current_timezone)
+            event.start = event.start.astimezone(current_timezone)
 
             # Multi-day events end at midnight of the previous/current
             # day and thus show up after they're over.
