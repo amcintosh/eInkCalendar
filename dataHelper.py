@@ -168,6 +168,8 @@ def get_birthdays_google() -> Tuple[List[str], List[str]]:
     today = date.today()
     for result in results.get("responses"):
         person = result.get("person")
+        if not person.get("names") or not person.get("names")[0].get("displayName"):
+            continue
         birthday = get_birthday_date_from_google_person(person)
         if birthday and birthday.day == today.day and birthday.month == today.month and person.get("names"):
             birthday_names.append(person.get("names")[0].get("displayName"))
