@@ -32,7 +32,6 @@ FONT_ROBOTO_H1 = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'),
 FONT_ROBOTO_H2 = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 30)
 FONT_ROBOTO_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 20)
 FONT_ROBOTO_W = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 18)
-FONT_ROBOTO_W_SUB = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 14)
 FONT_ROBOTO_BIRTH = ImageFont.truetype(os.path.join(FONT_DICT, 'Roboto-Black.ttf'), 18)
 FONT_POPPINS_BOLD_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Poppins-Bold.ttf'), 20)
 FONT_POPPINS_P = ImageFont.truetype(os.path.join(FONT_DICT, 'Poppins-Regular.ttf'), 20)
@@ -107,34 +106,34 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
         weather_icon_width, weather_icon_height = weather.weather_icon.size
         weather_height = PADDING_TOP
 
-        temperature_str = f"{weather.temp}º (Feels Like {weather.feels_like})º"
-        weather_right_aligned = width - get_font_width(FONT_ROBOTO_W, temperature_str) - PADDING_R
+        temperature_str = f"{weather.temp}º (Feels Like {weather.feels_like}º)"
+        weather_right_aligned = width - get_font_width(FONT_ROBOTO_P, temperature_str) - PADDING_R
         weather_icon_right_aligned = width - weather_icon_width - PADDING_R
 
-        draw.text((weather_right_aligned, weather_height), temperature_str, font=FONT_ROBOTO_W, fill=1)
-        weather_height += get_font_height(FONT_ROBOTO_W) * 1.5
+        draw.text((weather_right_aligned, weather_height), temperature_str, font=FONT_ROBOTO_P, fill=1)
+        weather_height += get_font_height(FONT_ROBOTO_P) * 1.5
         image.paste(weather.weather_icon, (round(weather_icon_right_aligned), round(weather_height + 10)))
 
         high_low_str = f"Low {weather.temp_min} / High {weather.temp_max}"
-        weather_right_aligned = width - get_font_width(FONT_ROBOTO_W_SUB, high_low_str) - PADDING_R
-        draw.text((weather_right_aligned, weather_height), high_low_str, font=FONT_ROBOTO_W_SUB, fill=1)
+        weather_right_aligned = width - get_font_width(FONT_ROBOTO_W, high_low_str) - PADDING_R
+        draw.text((weather_right_aligned, weather_height), high_low_str, font=FONT_ROBOTO_W, fill=1)
         weather_height += weather_icon_height
 
         weather_str = f"{weather.weather} - {weather.weather_desc}"
-        weather_right_aligned = width - get_font_width(FONT_ROBOTO_W_SUB, weather_str) - PADDING_R
-        draw.text((weather_right_aligned, weather_height), weather_str, font=FONT_ROBOTO_W_SUB, fill=1)
+        weather_right_aligned = width - get_font_width(FONT_ROBOTO_W, weather_str) - PADDING_R
+        draw.text((weather_right_aligned, weather_height), weather_str, font=FONT_ROBOTO_W, fill=1)
         weather_height += get_font_height(FONT_ROBOTO_W_SUB) * 1.5
 
         if weather.rain:
             weather_str = f"Rain: {weather.rain}mm"
-            weather_right_aligned = width - get_font_width(FONT_ROBOTO_W_SUB, weather_str) - PADDING_R
-            draw.text((weather_right_aligned, weather_height), weather_str, font=FONT_ROBOTO_W_SUB, fill=1)
-            weather_height += get_font_height(FONT_ROBOTO_W_SUB) * 1.5
+            weather_right_aligned = width - get_font_width(FONT_ROBOTO_W, weather_str) - PADDING_R
+            draw.text((weather_right_aligned, weather_height), weather_str, font=FONT_ROBOTO_W, fill=1)
+            weather_height += get_font_height(FONT_ROBOTO_W) * 1.5
         if weather.snow:
             weather_str = f"Snow: {weather.snow}mm"
-            weather_right_aligned = width - get_font_width(FONT_ROBOTO_W_SUB, weather_str) - PADDING_R
-            draw.text((weather_right_aligned, weather_height), weather_str, font=FONT_ROBOTO_W_SUB, fill=1)
-            weather_height += get_font_height(FONT_ROBOTO_W_SUB) * 1.5
+            weather_right_aligned = width - get_font_width(FONT_ROBOTO_W, weather_str) - PADDING_R
+            draw.text((weather_right_aligned, weather_height), weather_str, font=FONT_ROBOTO_W, fill=1)
+            weather_height += get_font_height(FONT_ROBOTO_W) * 1.5
     else:
         logger.info("Skipping weather")
 
