@@ -122,7 +122,7 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
         weather_str = f"{weather.weather} - {weather.weather_desc}"
         weather_right_aligned = width - get_font_width(FONT_ROBOTO_W, weather_str) - PADDING_R
         draw.text((weather_right_aligned, weather_height), weather_str, font=FONT_ROBOTO_W, fill=1)
-        weather_height += get_font_height(FONT_ROBOTO_W_SUB) * 1.5
+        weather_height += get_font_height(FONT_ROBOTO_W) * 1.5
 
         if weather.rain:
             weather_str = f"Rain: {weather.rain}mm"
