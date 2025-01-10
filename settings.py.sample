@@ -19,3 +19,6 @@ GOOGLE_CONTACTS_GROUP = "some_google_contacts_group_id"
 CALDAV_CONTACT_URL = "https://..."
 CALDAV_CONTACT_USER = "username"
 CALDAV_CONTACT_PWD = "passw0rd"
+
+OPENWEATHERMAP_API_KEY = "some_key"
+WEATHER_CITY = "Toronto, ON, CA"  # City, Province/State Code, Country Code
