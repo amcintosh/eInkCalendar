@@ -64,8 +64,8 @@ def get_weather():
             weather=today["weather"][0]["main"],
             weather_desc=today["weather"][0]["description"],
             weather_icon=get_weather_icon(today["weather"][0]["icon"][:2]),
-            rain=round(data.get("rain", 0)),
-            snow=round(data.get("snow", 0)),
+            rain=round(today.get("rain", 0)),
+            snow=round(today.get("snow", 0)),
             clouds=today["clouds"]
         )
         return weather
