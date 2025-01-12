@@ -73,7 +73,7 @@ def get_weather():
             weather=today["weather"][0]["main"],
             weather_desc=today["weather"][0]["description"].title(),
             weather_icon=get_weather_icon(today["weather"][0]["icon"][:2]),
-            rain=f"{round(today.get("rain", 0))}mm",
+            rain=f"{round(today.get('rain', 0))}mm",
             snow=get_snow_string(today.get("snow")),
             clouds=today["clouds"]
         )
