@@ -119,21 +119,15 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
         draw.text((weather_right_aligned, weather_height), high_low_str, font=FONT_ROBOTO_W, fill=1)
         weather_height += weather_icon_height
 
-        weather_str = f"{weather.weather} - {weather.weather_desc}"
+        if weather.weather == "Rain":
+            weather_str = f"{weather.weather_desc} ({weather.rain}mm)"
+        elif weather.weather == "Snow":
+            weather_str = f"{weather.weather_desc} ({weather.snow})"
+        else:
+            weather_str = f"{weather.weather_desc}"
         weather_right_aligned = width - get_font_width(FONT_ROBOTO_W, weather_str) - PADDING_R
         draw.text((weather_right_aligned, weather_height), weather_str, font=FONT_ROBOTO_W, fill=1)
         weather_height += get_font_height(FONT_ROBOTO_W) * 1.5
-
-        if weather.rain:
-            weather_str = f"Rain: {weather.rain}mm"
-            weather_right_aligned = width - get_font_width(FONT_ROBOTO_W, weather_str) - PADDING_R
-            draw.text((weather_right_aligned, weather_height), weather_str, font=FONT_ROBOTO_W, fill=1)
-            weather_height += get_font_height(FONT_ROBOTO_W) * 1.5
-        if weather.snow:
-            weather_str = f"Snow: {weather.snow}mm"
-            weather_right_aligned = width - get_font_width(FONT_ROBOTO_W, weather_str) - PADDING_R
-            draw.text((weather_right_aligned, weather_height), weather_str, font=FONT_ROBOTO_W, fill=1)
-            weather_height += get_font_height(FONT_ROBOTO_W) * 1.5
     else:
         logger.info("Skipping weather")
 

@@ -26,8 +26,8 @@ class Weather:
     weather: str
     weather_desc: str
     weather_icon: Image
-    rain: int
-    snow: int
+    rain: str
+    snow: str
     clouds: int
 
 
@@ -46,6 +46,15 @@ def get_weather_icon(icon: str) -> TImage:
     return image.resize((100, 100)).convert("1")
 
 
+def get_snow_string(snow: float) -> str:
+    if not snow:
+        return None
+    if snow < 1:
+        return "<1cm"
+    else:
+        return f"{round(snow)}cm"
+
+
 def get_weather():
     lat, lon = get_lat_long()
     if not lat or not lon:
@@ -62,10 +71,10 @@ def get_weather():
             temp_min=round(today["temp"]["min"]),
             temp_max=round(today["temp"]["max"]),
             weather=today["weather"][0]["main"],
-            weather_desc=today["weather"][0]["description"],
+            weather_desc=today["weather"][0]["description"].title(),
             weather_icon=get_weather_icon(today["weather"][0]["icon"][:2]),
-            rain=round(today.get("rain", 0)),
-            snow=round(today.get("snow", 0)),
+            rain=f"{round(today.get("rain", 0))}mm",
+            snow=get_snow_string(today.get("snow")),
             clouds=today["clouds"]
         )
         return weather
