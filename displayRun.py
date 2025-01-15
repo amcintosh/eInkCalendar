@@ -123,6 +123,8 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
             weather_str = f"{weather.weather_desc} ({weather.rain}mm)"
         elif weather.weather == "Snow":
             weather_str = f"{weather.weather_desc} ({weather.snow})"
+        elif weather.weather == "Clouds":
+            weather_str = f"{weather.weather_desc} ({weather.clouds}%)"
         else:
             weather_str = f"{weather.weather_desc}"
         weather_right_aligned = width - get_font_width(FONT_ROBOTO_W, weather_str) - PADDING_R
