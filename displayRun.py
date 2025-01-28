@@ -21,7 +21,7 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"),
                     logging.StreamHandler()])
 logger = logging.getLogger('app')
 
-MAX_EVENTS = 9
+MAX_EVENTS = 15
 
 CURRENT_DICT = os.path.dirname(os.path.realpath(__file__))
 PICTURE_DICT = os.path.join(CURRENT_DICT, 'pictures')
@@ -77,6 +77,7 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
     PADDING_L = int(width/45)
     PADDING_R = int(width/30)
     PADDING_TOP = int(height/30)
+    FOOTER_HEIGHT = int(height * 0.82)
     now = time.localtime()
     max_days_in_month = calendar.monthrange(now.tm_year, now.tm_mon)[1]
     day_str = time.strftime("%A")
@@ -172,8 +173,11 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
         draw.text((PADDING_L + summmary_padding, current_height), event.summary, font=FONT_POPPINS_P, fill=1)
         current_height += get_font_height(FONT_POPPINS_P) * 1.5
 
+        if current_height + get_font_height(FONT_POPPINS_P) * 3 >= FOOTER_HEIGHT:
+            break
+
     # Portal-Icons
-    current_height = int(height * 0.82)
+    current_height = FOOTER_HEIGHT
     draw.line((PADDING_L, current_height, width - PADDING_R, current_height), fill=1, width=LINE_WIDTH)
     current_height += 5
 

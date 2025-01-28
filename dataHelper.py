@@ -40,10 +40,11 @@ def get_events(max_number: int) -> List[Event]:
 def get_webdav_events(url: str, max_number: int) -> List[Event]:
     logger.info("Retrieving calendar infos")
     current_timezone = ZoneInfo(settings.LOCAL_TIMEZONE)
+    calendar_start = datetime.now(current_timezone)
     today_midnight = datetime.now(current_timezone).replace(hour=0, minute=0, second=0, microsecond=0)
     is_apple = "icloud" in url
     try:
-        event_list = events(url, fix_apple=is_apple)
+        event_list = events(url, start=calendar_start, fix_apple=is_apple)
         event_list.sort(key=sort_by_date)
 
         start_count = 0

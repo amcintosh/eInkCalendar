@@ -88,6 +88,8 @@ def get_portal_images(cake=False) -> List[TImage]:
         image_list.append(load_picture("New_years_icon.png"))
     if today.month == 2 and today.day == 14:
         image_list.append(load_picture("Valentines_icon.png"))
+    if today.month == 10 and today.day == 31:
+        image_list.append(load_picture("Halloween_icon.png"))
     if today.month == 12 and today.day in [24, 25]:
         image_list.append(load_picture("Christmas_tree_icon.png"))
 
