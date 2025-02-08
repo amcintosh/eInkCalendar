@@ -173,7 +173,7 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
         draw.text((PADDING_L + summmary_padding, current_height), event.summary, font=FONT_POPPINS_P, fill=1)
         current_height += get_font_height(FONT_POPPINS_P) * 1.5
 
-        if current_height + get_font_height(FONT_POPPINS_P) * 3 >= FOOTER_HEIGHT:
+        if current_height + get_font_height(FONT_ROBOTO_P) + get_font_height(FONT_POPPINS_P) * 3 >= FOOTER_HEIGHT:
             break
 
     # Portal-Icons

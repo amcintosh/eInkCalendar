@@ -7,11 +7,11 @@ from zoneinfo import ZoneInfo
 
 import requests
 import vobject
+from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from humanize import ordinal
 from icalevents.icalevents import events
 from icalevents.icalparser import Event
@@ -22,7 +22,7 @@ import settings
 
 logger = logging.getLogger('app')
 
-UPCOMING_BIRTHDAY_DAYS = 10
+UPCOMING_BIRTHDAY_DAYS = 8
 
 
 def sort_by_date(e: Event):
@@ -137,21 +137,29 @@ def get_birthdays_google() -> Tuple[List[str], List[str]]:
     upcoming_birthday_names: List[str] = []
 
     creds = None
-    if os.path.exists("token.json"):
-        # The file token.json stores the user's access and refresh tokens, and is
-        # created automatically when the authorization flow completes for the first time.
-        creds = Credentials.from_authorized_user_file("token.json", scopes)
+    try:
+        if os.path.exists("token.json"):
+            # The file token.json stores the user's access and refresh tokens, and is
+            # created automatically when the authorization flow completes for the first time.
+            creds = Credentials.from_authorized_user_file("token.json", scopes)
+            if creds and creds.refresh_token:
+                logger.info("Refreshing credentials")
+                creds.refresh(Request())
+        if not creds or not creds.valid:
+            # If there are no (valid) credentials available, let the user log in.
+            if creds and creds.expired and creds.refresh_token:
+                logger.info("Refreshing credentials on expired")
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file("credentials.json", scopes)
+                creds = flow.run_local_server(port=0)
+                # Save the credentials for the next run
+                with open("token.json", "w") as token:
+                    token.write(creds.to_json())
+    except RefreshError:
+        logger.warning("Failed to refresh credentials")
+        return [], []
 
-    if not creds or not creds.valid:
-        # If there are no (valid) credentials available, let the user log in.
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", scopes)
-            creds = flow.run_local_server(port=0)
-            # Save the credentials for the next run
-            with open("token.json", "w") as token:
-                token.write(creds.to_json())
     try:
         service = build("people", "v1", credentials=creds)
 
@@ -164,7 +172,7 @@ def get_birthdays_google() -> Tuple[List[str], List[str]]:
             resourceNames=group.get("memberResourceNames"),
             personFields="names,birthdays",
         ).execute()
-    except HttpError as e:
+    except Exception as e:
         logger.critical(e)
         return [], []
 
