@@ -1,0 +1,16 @@
+meta {
+  name: Get a province or territory by abbreviation
+  type: http
+  seq: 4
+}
+
+get {
+  url: https:/canada-holidays.ca//api/v1/provinces/:provinceId
+  body: none
+  auth: none
+}
+
+params:query {
+  ~year: 
+  ~optional: 
+}

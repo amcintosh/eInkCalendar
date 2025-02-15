@@ -1,0 +1,19 @@
+meta {
+  name: Weather Onecall
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://api.openweathermap.org/data/3.0/onecall?lat=43.6534817&lon=-79.3839347&exclude=minutely,hourly,alerts&units=metric&appid={{process.env.WEATHER_API_KEY}}
+  body: none
+  auth: none
+}
+
+params:query {
+  lat: 43.6534817
+  lon: -79.3839347
+  exclude: minutely,hourly,alerts
+  units: metric
+  appid: {{process.env.WEATHER_API_KEY}}
+}

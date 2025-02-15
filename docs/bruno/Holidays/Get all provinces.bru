@@ -1,0 +1,16 @@
+meta {
+  name: Get all provinces
+  type: http
+  seq: 3
+}
+
+get {
+  url: https:/canada-holidays.ca//api/v1/provinces
+  body: none
+  auth: none
+}
+
+params:query {
+  ~year: 
+  ~optional: 
+}

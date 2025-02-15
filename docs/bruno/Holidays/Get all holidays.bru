@@ -1,0 +1,17 @@
+meta {
+  name: Get all holidays
+  type: http
+  seq: 1
+}
+
+get {
+  url: https:/canada-holidays.ca//api/v1/holidays
+  body: none
+  auth: none
+}
+
+params:query {
+  ~year: 
+  ~federal: 
+  ~optional: 
+}

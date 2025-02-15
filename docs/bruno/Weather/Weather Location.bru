@@ -1,0 +1,17 @@
+meta {
+  name: Weather Location
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.openweathermap.org/geo/1.0/direct?q=Toronto, ON, CA&limit=5&appid={{process.env.WEATHER_API_KEY}}
+  body: none
+  auth: none
+}
+
+params:query {
+  q: Toronto, ON, CA
+  limit: 5
+  appid: {{process.env.WEATHER_API_KEY}}
+}
