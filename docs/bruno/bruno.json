@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "eInk Calendar Data",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
