@@ -11,7 +11,7 @@ from PIL.Image import Image as TImage
 from PIL.ImageDraw import ImageDraw as TImageDraw
 
 from dataHelper import get_birthdays, get_events
-from displayHelpers import clear_display, get_font_height, get_font_width, get_portal_images, init_display, set_sleep
+from displayHelpers import clear_display, get_font_height, get_font_width, get_footer_images, init_display, set_sleep
 from settings import DEBUG, LOCALE, ROTATE_IMAGE
 from weather import get_weather
 
@@ -176,7 +176,7 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
         if current_height + get_font_height(FONT_ROBOTO_P) + get_font_height(FONT_POPPINS_P) * 3 >= FOOTER_HEIGHT:
             break
 
-    # Portal-Icons
+    # Footer Icons
     current_height = FOOTER_HEIGHT
     draw.line((PADDING_L, current_height, width - PADDING_R, current_height), fill=1, width=LINE_WIDTH)
     current_height += 5
@@ -185,7 +185,7 @@ def render_content(draw: TImageDraw, image: TImage,  height: int, width: int):
     draw_cake = len(bithday_persons) > 0
     image_padding = PADDING_L
     image_height = 0
-    for botton_image in get_portal_images(draw_cake):
+    for botton_image in get_footer_images(draw_cake):
         image.paste(botton_image, (image_padding, current_height))
 
         image_width, image_height = botton_image.size

@@ -5,12 +5,16 @@ meta {
 }
 
 get {
-  url: https:/canada-holidays.ca//api/v1/provinces/:provinceId
+  url: https://canada-holidays.ca/api/v1/provinces/:province_id?optional=true
   body: none
   auth: none
 }
 
 params:query {
+  optional: true
   ~year: 
-  ~optional: 
+}
+
+params:path {
+  province_id: ON
 }

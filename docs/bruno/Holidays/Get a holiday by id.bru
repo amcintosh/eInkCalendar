@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: https:/canada-holidays.ca//api/v1/holidays/{{holiday_id}}
+  url: https://canada-holidays.ca/api/v1/holidays/:holiday_id
   body: none
   auth: none
 }
@@ -13,4 +13,8 @@ get {
 params:query {
   ~year: 
   ~optional: 
+}
+
+params:path {
+  holiday_id: 1
 }

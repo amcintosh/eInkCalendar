@@ -8,6 +8,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 from PIL.Image import Image as TImage
 from PIL.ImageDraw import ImageDraw as TImageDraw
 
+from holidays import get_todays_holiday
+
 logger = logging.getLogger('app')
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 PICTURES_PATH = os.path.join(CURRENT_PATH, 'pictures')
@@ -68,10 +70,13 @@ def convert_image_to_screen(image: TImage) -> TImage:
     return Image.fromarray(converted_image_array, "RGB")
 
 
-def get_portal_images(cake=False) -> List[TImage]:
+def get_footer_images(has_birthday=False) -> List[TImage]:
     def load_picture(name: str) -> TImage:
-        image = Image.open(os.path.join(PICTURES_PATH, name))
-        return ImageOps.invert(image.convert('RGB'))
+        file_path = os.path.join(PICTURES_PATH, name)
+        if os.path.exists(file_path):
+            image = Image.open(file_path)
+            return ImageOps.invert(image.convert('RGB'))
+        return None
 
     def bool_to_array_index(boolean: bool) -> int:
         if boolean:
@@ -83,11 +88,23 @@ def get_portal_images(cake=False) -> List[TImage]:
     image_cake_names = ["Cake_icon.gif", "Cake_icon_on.gif"]
 
     image_list = []
-    image_list.append(load_picture(image_cake_names[bool_to_array_index(cake)]))
-    if (today.month == 1 and today.day == 1) or (today.month == 12 and today.day == 31):
-        image_list.append(load_picture("New_years_icon.png"))
+
+    # Birthday Cake First
+    image_list.append(load_picture(image_cake_names[bool_to_array_index(has_birthday)]))
+
+    # Holidays
+    holiday = get_todays_holiday()
+    if holiday:
+        holiday = holiday.replace("’", "").replace(" ", "_").capitalize()
+        icon = load_picture(f"{holiday}_icon.png")
+        if icon:
+            image_list.append(icon)
+
+    # Additional Special Days
+    if (today.month == 12 and today.day == 31):  # Also show on New Year's Eve
+        image_list.append(load_picture("New_years_day_icon.png"))
     if today.month == 2 and today.day == 14:
-        image_list.append(load_picture("Valentines_icon.png"))
+        image_list.append(load_picture("Valentines_day_icon.png"))
     if today.month == 10 and today.day == 31:
         image_list.append(load_picture("Halloween_icon.png"))
     if today.month == 12 and today.day in [24, 25]:
