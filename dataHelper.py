@@ -122,7 +122,7 @@ def get_birthday_date_from_google_person(person: dict) -> date:
         today = date.today()
         month = birthday.get("month")
         day = birthday.get("day")
-        if month == 2 and day == 29 and today.year % 4 != 0:
+        if month == 2 and day == 29 and today.year % 4 != 0:  # Will be inaccurate in year 2100 ;p
             day = 28
 
         return date(year=today.year, month=month, day=day)

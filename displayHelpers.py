@@ -109,5 +109,7 @@ def get_footer_images(has_birthday=False) -> List[TImage]:
         image_list.append(load_picture("Halloween_icon.png"))
     if today.month == 12 and today.day in [24, 25]:
         image_list.append(load_picture("Christmas_tree_icon.png"))
+    if today.day == 13 and today.isoweekday() == 5:
+        image_list.append(load_picture("Friday_13_icon.png"))
 
     return image_list
