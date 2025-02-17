@@ -174,7 +174,7 @@ def get_birthdays_google() -> Tuple[List[str], List[str]]:
         ).execute()
     except Exception as e:
         logger.critical(e)
-        return [], []
+        return [], ["Broken Credentials"]
 
     today = date.today()
     for result in results.get("responses"):
