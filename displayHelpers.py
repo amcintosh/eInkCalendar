@@ -101,6 +101,8 @@ def get_footer_images(has_birthday=False) -> List[TImage]:
             image_list.append(icon)
 
     # Additional Special Days
+    if today.month == 2 and today.day == 20:
+        image_list.append(load_picture("Anniversary_icon.png"))
     if (today.month == 12 and today.day == 31):  # Also show on New Year's Eve
         image_list.append(load_picture("New_years_day_icon.png"))
     if today.month == 2 and today.day == 14:
