@@ -158,7 +158,6 @@ def get_birthdays_google() -> Tuple[List[str], List[str]]:
                     token.write(creds.to_json())
     except RefreshError:
         logger.warning("Failed to refresh credentials")
-        return [], []
 
     try:
         service = build("people", "v1", credentials=creds)
