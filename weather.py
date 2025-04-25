@@ -34,7 +34,7 @@ class Weather:
 def get_lat_long():
     geo_url = f"{BASE_URL}/geo/1.0/direct?q={WEATHER_CITY}&limit={CITY_LIMIT}&appid={OPENWEATHERMAP_API_KEY}"
     try:
-        data = requests.get(geo_url).json()
+        data = requests.get(geo_url, timeout=10).json()
         return data[0].get("lat"), data[0].get("lon")
     except Exception as e:
         logger.error("Failed to fetch city location", e)
