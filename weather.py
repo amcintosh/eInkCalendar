@@ -56,12 +56,13 @@ def get_snow_string(snow: float) -> str:
 
 
 def get_weather():
+    logger.info("Fetching weather data")
     lat, lon = get_lat_long()
     if not lat or not lon:
         return None
     weather_url = f"{BASE_URL}/data/3.0/onecall?lat={lat}&lon={lon}&exclude=minutely,hourly,alerts&units=metric&appid={OPENWEATHERMAP_API_KEY}"
     try:
-        data = requests.get(weather_url).json()
+        data = requests.get(weather_url, timeout=10).json()
 
         current = data["current"]
         today = data["daily"][0]
@@ -73,7 +74,7 @@ def get_weather():
             weather=today["weather"][0]["main"],
             weather_desc=today["weather"][0]["description"].title(),
             weather_icon=get_weather_icon(today["weather"][0]["icon"][:2]),
-            rain=f"{round(today.get('rain', 0))}mm",
+            rain=round(today.get('rain', 0)),
             snow=get_snow_string(today.get("snow")),
             clouds=today["clouds"]
         )

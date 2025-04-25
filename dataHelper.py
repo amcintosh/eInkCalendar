@@ -30,6 +30,7 @@ def sort_by_date(e: Event):
 
 
 def get_events(max_number: int) -> List[Event]:
+    logger.info("Retrieving calendar infos")
     cal_events = []
     for calendar_url in settings.CALENDAR_URLS:
         cal_events.extend(get_webdav_events(calendar_url, max_number))
@@ -38,7 +39,7 @@ def get_events(max_number: int) -> List[Event]:
 
 
 def get_webdav_events(url: str, max_number: int) -> List[Event]:
-    logger.info("Retrieving calendar infos")
+    logger.info("Retrieving calendar %s", url)
     current_timezone = ZoneInfo(settings.LOCAL_TIMEZONE)
     calendar_start = datetime.now(current_timezone)
     today_midnight = datetime.now(current_timezone).replace(hour=0, minute=0, second=0, microsecond=0)
