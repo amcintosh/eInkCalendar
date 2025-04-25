@@ -32,6 +32,7 @@ class Weather:
 
 
 def get_lat_long():
+    logger.info("Fetching weather geolocation")
     geo_url = f"{BASE_URL}/geo/1.0/direct?q={WEATHER_CITY}&limit={CITY_LIMIT}&appid={OPENWEATHERMAP_API_KEY}"
     try:
         data = requests.get(geo_url, timeout=10).json()
